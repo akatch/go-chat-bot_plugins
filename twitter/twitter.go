@@ -5,14 +5,15 @@ package twitter
 import (
 	"errors"
 	"fmt"
-	"github.com/dghubble/go-twitter/twitter"
-	"github.com/go-chat-bot/bot"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/dghubble/go-twitter/twitter"
+	"github.com/go-chat-bot/bot"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 // findTweetIDs checks a given message string for strings that look like Twitter links,
@@ -159,10 +160,6 @@ func formatTweets(tweets []twitter.Tweet) []string {
 	newlines := regexp.MustCompile(`\r?\n`)
 	var messages []string
 	for _, tweet := range tweets {
-		// TODO get link title, eg: Tweet from @user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
-		// tweet.Entities.Urls contains []URLEntity
-		// fetch title from urlEntity.URL
-		// urls plugin already correctly handles t.co links
 		username := tweet.User.ScreenName
 		text := newlines.ReplaceAllString(tweet.FullText, " ")
 		newMessage := fmt.Sprintf(formatString, username, text)
