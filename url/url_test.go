@@ -2,11 +2,12 @@ package url
 
 import (
 	"fmt"
-	"github.com/go-chat-bot/bot"
-	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-chat-bot/bot"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestURL(t *testing.T) {
@@ -101,5 +102,12 @@ func TestURL(t *testing.T) {
 			So(extractURL(":googlecom"), ShouldEqual, "")
 		})
 
+		Convey("if the text has a period followed by whitespace", func() {
+			noProtocolURL := "google. com"
+
+			extractedURL := extractURL(fmt.Sprintf("foo %s bar", noProtocolURL))
+
+			So(extractedURL, ShouldBeBlank)
+		})
 	})
 }

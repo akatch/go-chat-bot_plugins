@@ -1,12 +1,13 @@
 package url
 
 import (
-	"github.com/go-chat-bot/bot"
-	"github.com/go-chat-bot/plugins/web"
 	"html"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/go-chat-bot/bot"
+	"github.com/go-chat-bot/plugins/web"
 )
 
 const (
@@ -18,9 +19,11 @@ var (
 )
 
 func canBeURLWithoutProtocol(text string) bool {
+	rx := regexp.MustCompile("\\S\\.\\S")
 	return len(text) > minDomainLength &&
 		!strings.HasPrefix(text, "http") &&
-		strings.Contains(text, ".")
+		// update to require '\s.\s'
+		rx.Match([]byte(text))
 }
 
 func extractURL(text string) string {
