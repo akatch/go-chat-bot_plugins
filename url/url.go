@@ -1,12 +1,13 @@
 package url
 
 import (
-	"github.com/go-chat-bot/bot"
-	"github.com/go-chat-bot/plugins/web"
 	"html"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/go-chat-bot/bot"
+	"github.com/go-chat-bot/plugins/web"
 )
 
 const (
@@ -26,6 +27,7 @@ func canBeURLWithoutProtocol(text string) bool {
 func extractURL(text string) string {
 	extractedURL := ""
 	for _, value := range strings.Split(text, " ") {
+		value = strings.TrimSuffix(strings.TrimSpace(value), ".")
 		if canBeURLWithoutProtocol(value) {
 			value = "http://" + value
 		}
