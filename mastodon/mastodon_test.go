@@ -10,33 +10,19 @@ import (
 
 func TestMastodon(t *testing.T) {
 	// given a message string, I should get back a response message string
-	// containing one or more parsed Tweets
+	// containing one or more parsed Statuses
 	fooOutput := `Toot from Micah Lee: Since Elon Musk acquired Twitter on October 27, 2022, Semiphemeral has deleted 7.7M tweets, 4.6M retweets, 13.2M likes, and 3.5M direct messages from Twitter`
 	fooURL := `https://ricearoni.org/notice/APjms6WVgEKbZ2MSsi`
-	barOutput := `Toot from John Watson: hey y'all i made this for #Godot in case you want to be awesome https://github.com/jotson/ridiculous_coding`
+	// Mastodon injects weird span tags into Statuses which render as spaces. Dunno why.
+	barOutput := `Toot from John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
 	barURL := `https://mastodon.gamedev.place/@jotson/109367069016579141`
-	bazOutput := `Toot from John Watson: hey y'all i made this for #Godot in case you want to be awesome https://github.com/jotson/ridiculous_coding`
+	bazOutput := `Toot from John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
 	bazURL := `https://fosstodon.org/@jotson@mastodon.gamedev.place/109367069171884095`
-	quuxOutput := `Toot from Andrew Nadeau: [after leaving willy wonka’s factory]
-me:
-wife:
-me:
-wife:
-me:
-wife: lot of deaths for a to—
-me: a LOT of deaths for a tour!`
+	quuxOutput := `Toot from Andrew Nadeau: [after leaving willy wonka’s factory] me: wife: me: wife: me: wife: lot of deaths for a to— me: a LOT of deaths for a tour!`
 	quuxURL := `https://mastodon.social/@AndrewNadeau/109361740736612801`
-	fredOutput := `Toot from yan: nobody:
-
-absolutely nobody:
-
-yubikey: cccjgjgkhcbbcvchfkfhiiuunbtnvgihdfiktncvlhck`
+	fredOutput := `Toot from yan: nobody:  absolutely nobody:  yubikey: cccjgjgkhcbbcvchfkfhiiuunbtnvgihdfiktncvlhck`
 	fredURL := `https://infosec.exchange/@bcrypt/109341144608902590`
-	thudOutput := `Toot from Tom Grochowiak: Just realised that since I'm new here, I haven't yet spammed my fave (and most useless) project this year.
-
-A genetic algorithm that attempts to give birth to a designated image.
-
-#gamedev #procedural`
+	thudOutput := `Toot from Tom Grochowiak: Just realised that since I'm new here, I haven't yet spammed my fave (and most useless) project this year.  A genetic algorithm that attempts to give birth to a designated image.  # gamedev # procedural # procgen`
 	thudURL := `https://mastodon.gamedev.place/@tomgrochowiak/109365654828117404`
 
 	var cases = []struct {

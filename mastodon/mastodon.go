@@ -9,17 +9,17 @@ import (
 	"strings"
 
 	"github.com/go-chat-bot/bot"
+	"github.com/jaytaylor/html2text"
 	"github.com/mattn/go-mastodon"
-	"jaytaylor.com/html2text"
 )
 
 type Status struct {
 	server, id string
 }
 
-// findStatuses checks a given message string for strings that look like Twitter links,
-// then attempts to extract the Tweet ID from the link.
-// It returns an array of Tweet IDs.
+// findStatuses checks a given message string for strings that look like Mastodon links,
+// then attempts to extract the server and status ID from the link.
+// It returns an array of Statuses.
 func findStatuses(message string) ([]Status, error) {
 	re := regexp.MustCompile(`(http(?:s)?://[A-z0-9\.\-\/]+[^/])/(?:@.*@(.*)?)?(?:.*)/(statuses/|notice/)?([A-z0-9]*)`)
 	result := re.FindAllStringSubmatch(message, -1)
@@ -45,74 +45,73 @@ func findStatuses(message string) ([]Status, error) {
 	return statuses, err
 }
 
-// fetchTweets takes an array of Tweet IDs and retrieves the corresponding
+// fetchStatuses takes an array of Status IDs and retrieves the corresponding
 // Statuses.
-// It returns an array of twitter.Tweets.
-func fetchTweets(tweetIDs []Status) ([]mastodon.Status, error) {
-	var tweets []mastodon.Status
-	for _, tweetID := range tweetIDs {
-		tweet, err := fetchTweet(tweetID)
+// It returns an array of Statuses.
+func fetchStatuses(s []Status) ([]mastodon.Status, error) {
+	var statuses []mastodon.Status
+	for _, id := range s {
+		st, err := fetchStatus(id)
 		if err != nil {
 			return nil, err
 		}
-		tweets = append(tweets, *tweet)
+		statuses = append(statuses, *st)
 	}
-	return tweets, nil
+	return statuses, nil
 }
 
-// fetchTweet takes a twitter.Client and a single Tweet ID and fetches the
+// fetchStatus takes a single Status ID and returns the
 // corresponding Status.
-// It returns a twitter.Tweet.
-func fetchTweet(tweetID Status) (*mastodon.Status, error) {
+func fetchStatus(s Status) (*mastodon.Status, error) {
 	// credentials are not needed for mastodon
-	client := mastodon.NewClient(&mastodon.Config{Server: tweetID.server})
-	tweet, err := client.GetStatus(context.Background(), mastodon.ID(tweetID.id))
+	client := mastodon.NewClient(&mastodon.Config{Server: s.server})
+	status, err := client.GetStatus(context.Background(), mastodon.ID(s.id))
 
-	return tweet, err
+	return status, err
 }
 
-// formatTweets takes an array of twitter.Tweets and formats them in preparation for
+// formatStatuses takes an array of Statuses and formats them in preparation for
 // sending as a chat message.
 // It returns an array of nicely formatted strings.
-func formatTweets(tweets []mastodon.Status) []string {
+func formatStatuses(s []mastodon.Status) []string {
 	formatString := "Toot from %s: %s"
-	//newlines := regexp.MustCompile(`\r?\n`)
+	newlines := regexp.MustCompile(`\r?\n`)
 	var messages []string
-	for _, tweet := range tweets {
-		// TODO get link title, eg: Tweet from @user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
+	for _, st := range s {
+		// TODO get link title, eg: Toot from user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
 		// TODO get alt text
-		username := tweet.Account.DisplayName
-		pt, err := html2text.FromString(tweet.Content, html2text.Options{TextOnly: true, OmitLinks: true})
+		username := st.Account.DisplayName
+		pt, err := html2text.FromString(st.Content, html2text.Options{TextOnly: true, OmitLinks: true})
 		if err != nil {
 			return nil
 		}
-		//text := newlines.ReplaceAllString(pt, " ")
-		newMessage := fmt.Sprintf(formatString, username, pt)
+		text := newlines.ReplaceAllString(pt, " ")
+		newMessage := fmt.Sprintf(formatString, username, text)
 		messages = append(messages, newMessage)
 	}
 	return messages
 }
 
-// expandTweets receives a bot.PassiveCmd and performs the full parse-and-fetch
-// pipeline. It sets up a client, finds Tweet IDs in the message text, fetches
-// the tweets, and formats them. If multiple Tweet IDs were found in the message,
-// all formatted Tweets will be joined into a single message.
+// expandToots receives a bot.PassiveCmd and performs the full parse-and-fetch
+// pipeline. It sets up a client, finds Status IDs in the message text, fetches
+// the statuses, and formats them. If multiple Status IDs were found in the message,
+// all formatted Statuses will be joined into a single message.
 // It returns a single string suitable for sending as a chat message.
 func expandToots(cmd *bot.PassiveCmd) (string, error) {
 	var message string
 	messageText := cmd.MessageData.Text
 
-	tweetIDs, err := findStatuses(messageText)
+	ids, err := findStatuses(messageText)
 	if err != nil {
 		return message, err
 	}
 
-	statuses, err := fetchTweets(tweetIDs)
+	statuses, err := fetchStatuses(ids)
 	if err != nil {
 		return message, err
 	}
 
-	formattedStatuses := formatTweets(statuses)
+	formattedStatuses := formatStatuses(statuses)
 	if formattedStatuses != nil {
 		message = strings.Join(formattedStatuses, "\n")
 	}
