@@ -2,17 +2,19 @@ package twitter
 
 import (
 	"errors"
-	"github.com/go-chat-bot/bot"
+	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/go-chat-bot/bot"
 )
 
 func TestTwitter(t *testing.T) {
 	// given a message string, I should get back a response message string
 	// containing one or more parsed Tweets
-	jbouieOutput := `Tweet from @jbouie: This falls into one of my favorite genres of tweets, bona fide elites whose pretenses to understanding “common people” instead reveal their cloistered, condescending view of ordinary people. https://t.co/KV8xnG2w48`
-	sethAbramsonOutput := `Tweet from @SethAbramson: This is the first U.S. presidential election in which "Vote Him Out Before He Kills You and Your Family" is a wholly reasonable slogan for the challenger`
-	dmackdrwnsOutput := `Tweet from @dmackdrwns: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart https://t.co/C983t6QjmT`
+	jbouieOutput := `Tweet from b-boy bouiebaisse: This falls into one of my favorite genres of tweets, bona fide elites whose pretenses to understanding “common people” instead reveal their cloistered, condescending view of ordinary people. https://t.co/KV8xnG2w48`
+	sethAbramsonOutput := `Tweet from Seth Abramson: This is the first U.S. presidential election in which "Vote Him Out Before He Kills You and Your Family" is a wholly reasonable slogan for the challenger`
+	dmackdrwnsOutput := `Tweet from David Mack: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart https://t.co/C983t6QjmT`
 
 	var cases = []struct {
 		input, output string
@@ -73,7 +75,7 @@ func TestTwitter(t *testing.T) {
 			User:        &testingUser,
 			MessageData: &testingMessage,
 		}
-		t.Run(string(i), func(t *testing.T) {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			// these CANNOT run concurrently
 			// FIXME panic here when no credentials
 			got, err := expandTweets(&testingCmd)
@@ -114,7 +116,7 @@ func TestNewAuthenticatedTwitterClient(t *testing.T) {
 	}
 	newlines := regexp.MustCompile(`\r?\n`)
 	for i, c := range cases {
-		t.Run(string(i), func(t *testing.T) {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			// these CANNOT run concurrently
 			_, err := newAuthenticatedTwitterClient(c.key, c.secret)
 			if err != nil {
