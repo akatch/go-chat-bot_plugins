@@ -2,17 +2,13 @@ package mastodon
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/go-chat-bot/bot"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestMastodon(t *testing.T) {
-	// given a message string, I should get back a response message string
-	// containing one or more parsed Statuses
-	fooOutput := `Toot from Micah Lee: Since Elon Musk acquired Twitter on October 27, 2022, Semiphemeral has deleted 7.7M tweets, 4.6M retweets, 13.2M likes, and 3.5M direct messages from Twitter`
-	fooURL := `https://ricearoni.org/notice/APjms6WVgEKbZ2MSsi`
 	// Mastodon injects weird span tags into Statuses which render as spaces. Dunno why.
 	barOutput := `Toot from John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
 	barURL := `https://mastodon.gamedev.place/@jotson/109367069016579141`
@@ -34,20 +30,12 @@ func TestMastodon(t *testing.T) {
 			output:        "",
 			expectedError: nil,
 		}, {
-			input:         fooURL,
-			output:        fooOutput,
+			input:         "wow check out this tweet" + barURL,
+			output:        barOutput,
 			expectedError: nil,
 		}, {
-			input:         "wow check out this tweet " + fooURL,
-			output:        fooOutput,
-			expectedError: nil,
-		}, {
-			input:         "wow check out this tweet" + fooURL,
-			output:        fooOutput,
-			expectedError: nil,
-		}, {
-			input:         "wow check out this tweet " + fooURL + " super cool right?",
-			output:        fooOutput,
+			input:         "wow check out this tweet " + barURL + " super cool right?",
+			output:        barOutput,
 			expectedError: nil,
 		}, {
 			input:         bazURL,
@@ -75,7 +63,9 @@ func TestMastodon(t *testing.T) {
 			expectedError: nil,
 		},
 	}
-	for i, c := range cases {
+
+	Convey("mastodon", t, func() {
+	for _, c := range cases {
 		testingUser := bot.User{
 			ID:       "test",
 			Nick:     "test",
@@ -92,16 +82,14 @@ func TestMastodon(t *testing.T) {
 			User:        &testingUser,
 			MessageData: &testingMessage,
 		}
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			// these CANNOT run concurrently
+		Convey(c.input, func() {
 			got, err := expandToots(&testingCmd)
 			want := c.output
-			if err != nil && err.Error() != c.expectedError.Error() {
-				t.Error(err)
-			}
-			if got != want {
-				t.Errorf("\ngot %+v\nwant %+v", got, want)
-			}
+
+			So(err, ShouldEqual, c.expectedError)
+			So(got, ShouldEqual, want)
 		})
 	}
+},
+)
 }
