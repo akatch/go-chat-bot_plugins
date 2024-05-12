@@ -81,7 +81,7 @@ func TestMastodon(t *testing.T) {
 				},
 			}
 			Convey(c.input, func() {
-				got, err := expandToots(&testingCmd)
+				got, err := expandStatuses(&testingCmd)
 				want := c.output
 
 				So(err, ShouldResemble, c.expectedError)

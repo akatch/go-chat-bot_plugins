@@ -92,12 +92,12 @@ func formatStatuses(s []mastodon.Status) []string {
 	return messages
 }
 
-// expandToots receives a bot.PassiveCmd and performs the full parse-and-fetch
+// expandStatuses receives a bot.PassiveCmd and performs the full parse-and-fetch
 // pipeline. It sets up a client, finds Status IDs in the message text, fetches
 // the statuses, and formats them. If multiple Status IDs were found in the message,
 // all formatted Statuses will be joined into a single message.
 // It returns a single string suitable for sending as a chat message.
-func expandToots(cmd *bot.PassiveCmd) (string, error) {
+func expandStatuses(cmd *bot.PassiveCmd) (string, error) {
 	var message string
 	messageText := cmd.MessageData.Text
 
@@ -122,5 +122,5 @@ func expandToots(cmd *bot.PassiveCmd) (string, error) {
 func init() {
 	bot.RegisterPassiveCommand(
 		"fediverse",
-		expandToots)
+		expandStatuses)
 }
