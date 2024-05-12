@@ -29,3 +29,5 @@ _testmain.go
 
 # vim swap files
 *.swp
+.direnv/
+.envrc
