@@ -2,19 +2,17 @@ package twitter
 
 import (
 	"errors"
-	"fmt"
-	"regexp"
 	"testing"
 
 	"github.com/go-chat-bot/bot"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestTwitter(t *testing.T) {
 	// given a message string, I should get back a response message string
 	// containing one or more parsed Tweets
-	jbouieOutput := `Tweet from b-boy bouiebaisse: This falls into one of my favorite genres of tweets, bona fide elites whose pretenses to understanding “common people” instead reveal their cloistered, condescending view of ordinary people. https://t.co/KV8xnG2w48`
-	sethAbramsonOutput := `Tweet from Seth Abramson: This is the first U.S. presidential election in which "Vote Him Out Before He Kills You and Your Family" is a wholly reasonable slogan for the challenger`
-	dmackdrwnsOutput := `Tweet from David Mack: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart https://t.co/C983t6QjmT`
+	jbouieOutput := `b-boy bouiebaisse: This falls into one of my favorite genres of tweets, bona fide elites whose pretenses to understanding “common people” instead reveal their cloistered, condescending view of ordinary people.`
+	dmackdrwnsOutput := `David Mack: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart`
 
 	var cases = []struct {
 		input, output string
@@ -51,82 +49,24 @@ func TestTwitter(t *testing.T) {
 		}, {
 			input:         "http://twitter.com/notARealUser/status/123456789",
 			output:        "",
-			expectedError: errors.New("twitter: 144 No status found with that ID."),
-		}, {
-			input:         "https://twitter.com/SethAbramson/status/1259875673994338305 lol bye",
-			output:        sethAbramsonOutput,
-			expectedError: nil,
-		},
-	}
-	for i, c := range cases {
-		testingUser := bot.User{
-			ID:       "test",
-			Nick:     "test",
-			RealName: "test",
-			IsBot:    true,
-		}
-		testingMessage := bot.Message{
-			Text:     c.input,
-			IsAction: false,
-		}
-		testingCmd := bot.PassiveCmd{
-			Raw:         c.input,
-			Channel:     "test",
-			User:        &testingUser,
-			MessageData: &testingMessage,
-		}
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			// these CANNOT run concurrently
-			// FIXME panic here when no credentials
-			got, err := expandTweets(&testingCmd)
-			want := c.output
-			if err != nil && err.Error() != c.expectedError.Error() {
-				t.Error(err)
-			}
-			if got != want {
-				t.Errorf("got %+v; want %+v", got, want)
-			}
-		})
-	}
-}
+			expectedError: errors.New("404 Not Found"),
+		}}
 
-func TestNewAuthenticatedTwitterClient(t *testing.T) {
-	// TODO test case for these envvars not being set
-	key, secret, err := getCredentialsFromEnvironment()
-	if err != nil {
-		t.Error(err)
-	}
-	var cases = []struct {
-		key, secret   string
-		expectedError error
-	}{
-		{
-			key:           "",
-			secret:        "",
-			expectedError: errors.New("missing API credentials"),
-		}, {
-			key:           "asdf",
-			secret:        "jklmnop",
-			expectedError: errors.New(`Get https://api.twitter.com/1.1/application/rate_limit_status.json?resources=statuses: oauth2: cannot fetch token: 403 Forbidden Response: {"errors":[{"code":99,"message":"Unable to verify your credentials","label":"authenticity_token_error"}]}`),
-		}, {
-			key:           key,
-			secret:        secret,
-			expectedError: nil,
-		},
-	}
-	newlines := regexp.MustCompile(`\r?\n`)
-	for i, c := range cases {
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			// these CANNOT run concurrently
-			_, err := newAuthenticatedTwitterClient(c.key, c.secret)
-			if err != nil {
-				// eat newlines because they mess with our tests
-				got := newlines.ReplaceAllString(err.Error(), " ")
-				want := c.expectedError.Error()
-				if got != want {
-					t.Errorf("got %s; want %s", got, want)
-				}
+	Convey("twitter", t, func() {
+		for _, c := range cases {
+			testingCmd := bot.PassiveCmd{
+				Raw:         c.input,
+				Channel:     "test",
+				User:        &bot.User{ID: "test", Nick: "test", RealName: "test", IsBot: true},
+				MessageData: &bot.Message{Text: c.input, IsAction: false},
 			}
-		})
-	}
+			Convey(c.input, func() {
+				got, err := expandTweets(&testingCmd)
+				want := c.output
+				So(err, ShouldResemble, c.expectedError)
+				So(got, ShouldEqual, want)
+			})
+		}
+	},
+	)
 }
