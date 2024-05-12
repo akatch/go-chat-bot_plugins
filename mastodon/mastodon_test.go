@@ -84,7 +84,7 @@ func TestMastodon(t *testing.T) {
 				got, err := expandToots(&testingCmd)
 				want := c.output
 
-				So(err, ShouldEqual, c.expectedError)
+				So(err, ShouldResemble, c.expectedError)
 				So(got, ShouldEqual, want)
 			})
 		}
