@@ -24,7 +24,7 @@ type ruleOfAcquisition struct {
 func (r *ruleOfAcquisition) String() string {
 	// If the rule is empty, return an alternative message
 	if r.Rule == "" {
-		return fmt.Sprintf("Access to Rule of Acquisition %d is restricted. Please contact your local Ferengi Commerce Authority representative for more information.", r.Number)
+		return fmt.Sprintf("Access to Rule of Acquisition %d is restricted. Please contact your local Ferengi Commerce Authority liquidator for more information.", r.Number)
 	}
 	return fmt.Sprintf("Rule of Acquisition %d: %s", r.Number, r.Rule)
 }

@@ -68,7 +68,7 @@ func TestAcquisition(t *testing.T) {
 			got, error := acquisition(bot)
 
 			So(error, ShouldBeNil)
-			So(got, ShouldEqual, "Access to Rule of Acquisition 284 is restricted. Please contact your local Ferengi Commerce Authority representative for more information.")
+			So(got, ShouldEqual, "Access to Rule of Acquisition 284 is restricted. Please contact your local Ferengi Commerce Authority liquidator for more information.")
 		})
 	})
 }
