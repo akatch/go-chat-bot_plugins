@@ -1,4 +1,4 @@
-package mastodon
+package fediverse
 
 import (
 	"errors"
@@ -64,7 +64,7 @@ func TestMastodon(t *testing.T) {
 		},
 	}
 
-	Convey("mastodon", t, func() {
+	Convey("fediverse", t, func() {
 		for _, c := range cases {
 			testingCmd := bot.PassiveCmd{
 				Raw:     c.input,

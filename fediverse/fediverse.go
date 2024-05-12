@@ -1,6 +1,6 @@
-// Package mastodon provides a plugin that scrapes messages for Mastodon links,
+// Package fediverse provides a plugin that scrapes messages for Mastodon links,
 // then expands them into chat messages.
-package mastodon
+package fediverse
 
 import (
 	"context"
@@ -63,7 +63,7 @@ func fetchStatuses(s []Status) ([]mastodon.Status, error) {
 // fetchStatus takes a single Status ID and returns the
 // corresponding Status.
 func fetchStatus(s Status) (*mastodon.Status, error) {
-	// credentials are not needed for mastodon
+	// credentials are not needed for fediverse
 	client := mastodon.NewClient(&mastodon.Config{Server: s.server})
 	status, err := client.GetStatus(context.Background(), mastodon.ID(s.id))
 
@@ -121,6 +121,6 @@ func expandToots(cmd *bot.PassiveCmd) (string, error) {
 // init initalizes a PassiveCommand for expanding Toots.
 func init() {
 	bot.RegisterPassiveCommand(
-		"mastodon",
+		"fediverse",
 		expandToots)
 }
