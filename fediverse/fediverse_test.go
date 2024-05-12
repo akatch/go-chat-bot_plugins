@@ -10,15 +10,15 @@ import (
 
 func TestMastodon(t *testing.T) {
 	// Mastodon injects weird span tags into Statuses which render as spaces. Dunno why.
-	barOutput := `Toot from John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
+	barOutput := `John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
 	barURL := `https://mastodon.gamedev.place/@jotson/109367069016579141`
-	bazOutput := `Toot from John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
+	bazOutput := `John Watson: hey y'all i made this for # Godot in case you want to be awesome https:// github.com/jotson/ridiculous_c oding`
 	bazURL := `https://fosstodon.org/@jotson@mastodon.gamedev.place/109367069171884095`
-	quuxOutput := `Toot from Andrew Nadeau: [after leaving willy wonka’s factory] me: wife: me: wife: me: wife: lot of deaths for a to— me: a LOT of deaths for a tour!`
+	quuxOutput := `Andrew Nadeau: [after leaving willy wonka’s factory] me: wife: me: wife: me: wife: lot of deaths for a to— me: a LOT of deaths for a tour!`
 	quuxURL := `https://mastodon.social/@AndrewNadeau/109361740736612801`
-	fredOutput := `Toot from yan: nobody:  absolutely nobody:  yubikey: cccjgjgkhcbbcvchfkfhiiuunbtnvgihdfiktncvlhck`
+	fredOutput := `yan: nobody:  absolutely nobody:  yubikey: cccjgjgkhcbbcvchfkfhiiuunbtnvgihdfiktncvlhck`
 	fredURL := `https://infosec.exchange/@bcrypt/109341144608902590`
-	thudOutput := `Toot from Tom Grochowiak: Just realised that since I'm new here, I haven't yet spammed my fave (and most useless) project this year.  A genetic algorithm that attempts to give birth to a designated image.  # gamedev # procedural # procgen`
+	thudOutput := `Tom Grochowiak: Just realised that since I'm new here, I haven't yet spammed my fave (and most useless) project this year.  A genetic algorithm that attempts to give birth to a designated image.  # gamedev # procedural # procgen`
 	thudURL := `https://mastodon.gamedev.place/@tomgrochowiak/109365654828117404`
 
 	var cases = []struct {

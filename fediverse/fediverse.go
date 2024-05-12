@@ -74,11 +74,11 @@ func fetchStatus(s Status) (*mastodon.Status, error) {
 // sending as a chat message.
 // It returns an array of nicely formatted strings.
 func formatStatuses(s []mastodon.Status) []string {
-	formatString := "Toot from %s: %s"
+	formatString := "%s: %s"
 	newlines := regexp.MustCompile(`\r?\n`)
 	var messages []string
 	for _, st := range s {
-		// TODO get link title, eg: Toot from user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
+		// TODO get link title, eg: user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
 		// TODO get alt text
 		username := st.Account.DisplayName
 		pt, err := html2text.FromString(st.Content, html2text.Options{TextOnly: true, OmitLinks: true})
