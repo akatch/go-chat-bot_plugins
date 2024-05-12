@@ -2,8 +2,10 @@ package darwin
 
 import (
 	"fmt"
-	"github.com/go-chat-bot/bot"
 	"testing"
+
+	"github.com/go-chat-bot/bot"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestDarwin(t *testing.T) {
@@ -11,27 +13,24 @@ func TestDarwin(t *testing.T) {
 		text string
 		args []string
 	}{
-		{fmt.Sprintf(darwinQuote, "nick"), nil},
+		{fmt.Sprintf(darwinQuote, "test"), nil},
 		{fmt.Sprintf(darwinQuote, "someothernick"), []string{"someothernick"}},
 	}
-	for _, c := range cases {
-		t.Run(c.text, func(t *testing.T) {
+	for i, c := range cases {
+		Convey(fmt.Sprintf("Case %d", i), t, func() {
 			bot := &bot.Cmd{
 				Args:    c.args,
 				Command: "darwin",
 				User: &bot.User{
-					Nick:     "nick",
-					RealName: "Real Name",
+					Nick:     "test",
+					RealName: "test",
 				},
 			}
 			got, err := darwin(bot)
-			if err != nil {
-				t.Error(err)
-			}
+			want := c.text
 
-			if c.text != got {
-				t.Errorf("got %s; want %s", got, c.text)
-			}
+			So(err, ShouldResemble, nil)
+			So(got, ShouldEqual, want)
 		})
 
 	}
