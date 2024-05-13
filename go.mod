@@ -9,7 +9,8 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20190719072343-39e5462e111f
 	github.com/dghubble/oauth1 v0.6.0
 	github.com/go-chat-bot/bot v0.0.0-20191201225543-272d0f24a45f
-	github.com/mattn/go-mastodon v0.0.6 // indirect
+	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
+	github.com/mattn/go-mastodon v0.0.6
 	github.com/mvdan/xurls v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/smartystreets/goconvey v1.6.4
