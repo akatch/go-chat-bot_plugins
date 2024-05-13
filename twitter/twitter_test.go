@@ -65,7 +65,7 @@ func TestTwitter(t *testing.T) {
 				MessageData: &bot.Message{Text: c.input, IsAction: false},
 			}
 			Convey(c.input, func() {
-				got, err := expandTweets(&testingCmd)
+				got, err := expandStatuses(&testingCmd)
 				want := c.output
 				So(err, ShouldResemble, c.expectedError)
 				So(got, ShouldEqual, want)

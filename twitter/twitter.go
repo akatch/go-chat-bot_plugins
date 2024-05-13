@@ -24,47 +24,47 @@ type Status struct {
 	Text string `json:"tweet.text"`
 }
 
-// findTweetIDs checks a given message string for strings that look like Twitter links,
-// then attempts to extract the Tweet ID from the link.
-// It returns an array of Tweet IDs.
-func findTweetIDs(message string) ([]int64, error) {
+// findStatusIDs checks a given message string for strings that look like Twitter links,
+// then attempts to extract the Status ID from the link.
+// It returns an array of Status IDs.
+func findStatusIDs(message string) ([]int64, error) {
 	re := regexp.MustCompile(`http(?:s)?://((?:mobile.)?twitter|x).com/(?:.*)/status/([0-9]*)`)
 	// FIXME this is only returning the LAST match, should return ALL matches
 	result := re.FindAllStringSubmatch(message, -1)
 	var (
-		tweetIDs []int64
-		id       int64
-		err      error
+		statusIDs []int64
+		id        int64
+		err       error
 	)
 
 	for i := range result {
 		last := len(result[i]) - 1
 		idStr := result[i][last]
 		id, err = strconv.ParseInt(idStr, 10, 64)
-		tweetIDs = append(tweetIDs, id)
+		statusIDs = append(statusIDs, id)
 	}
-	return tweetIDs, err
+	return statusIDs, err
 }
 
-// fetchTweets takes an array of Tweet IDs and retrieves the corresponding
+// fetchStatuses takes an array of Status IDs and retrieves the corresponding
 // Statuses.
-// It returns an array of twitter.Tweets.
-func fetchTweets(tweetIDs []int64) ([]Status, error) {
-	var tweets []Status
-	for _, tweetID := range tweetIDs {
-		tweet, err := fetchTweet(tweetID)
+// It returns an array of twitter.Statuses.
+func fetchStatuses(statusIDs []int64) ([]Status, error) {
+	var statuses []Status
+	for _, statusID := range statusIDs {
+		status, err := fetchStatus(statusID)
 		if err != nil {
 			return nil, err
 		}
-		tweets = append(tweets, tweet)
+		statuses = append(statuses, status)
 	}
-	return tweets, nil
+	return statuses, nil
 }
 
-// fetchTweet takes a twitter.Client and a single Tweet ID and fetches the
+// fetchStatus takes a twitter.Client and a single Status ID and fetches the
 // corresponding Status.
-// It returns a twitter.Tweet.
-func fetchTweet(id int64) (Status, error) {
+// It returns a twitter.Status.
+func fetchStatus(id int64) (Status, error) {
 	// TODO get alt text
 	// tweet.media.photos[].altText
 	response, err := getJson(id)
@@ -101,55 +101,53 @@ func getJson(id int64) (map[string]interface{}, error) {
 	return response, err
 }
 
-// formatTweets takes an array of twitter.Tweets and formats them in preparation for
+// formatStatuses takes an array of twitter.Statuses and formats them in preparation for
 // sending as a chat message.
 // It returns an array of nicely formatted strings.
-func formatTweets(tweets []Status) []string {
+func formatStatuses(statuses []Status) []string {
 	formatString := "%s: %s"
 	newlines := regexp.MustCompile(`\r?\n`)
 	var messages []string
-	for _, tweet := range tweets {
+	for _, status := range statuses {
 		// TODO get link title, eg: User: look at this cool thing https://thing.cool (Link title: A Cool Thing)
-		// tweet.Entities.Urls contains []URLEntity
-		// fetch title from urlEntity.URL
 		// urls plugin already correctly handles t.co links
-		username := tweet.Name
-		text := newlines.ReplaceAllString(tweet.Text, " ")
+		username := status.Name
+		text := newlines.ReplaceAllString(status.Text, " ")
 		newMessage := fmt.Sprintf(formatString, username, text)
 		messages = append(messages, newMessage)
 	}
 	return messages
 }
 
-// expandTweets receives a bot.PassiveCmd and performs the full parse-and-fetch
-// pipeline. It sets up a client, finds Tweet IDs in the message text, fetches
-// the tweets, and formats them. If multiple Tweet IDs were found in the message,
-// all formatted Tweets will be joined into a single message.
+// expandStatuses receives a bot.PassiveCmd and performs the full parse-and-fetch
+// pipeline. It sets up a client, finds Status IDs in the message text, fetches
+// the statuses, and formats them. If multiple Status IDs were found in the message,
+// all formatted Statuses will be joined into a single message.
 // It returns a single string suitable for sending as a chat message.
-func expandTweets(cmd *bot.PassiveCmd) (string, error) {
+func expandStatuses(cmd *bot.PassiveCmd) (string, error) {
 	var message string
 	messageText := cmd.MessageData.Text
 
-	tweetIDs, err := findTweetIDs(messageText)
+	statusIDs, err := findStatusIDs(messageText)
 	if err != nil {
 		return message, err
 	}
 
-	tweets, err := fetchTweets(tweetIDs)
+	statuses, err := fetchStatuses(statusIDs)
 	if err != nil {
 		return message, err
 	}
 
-	formattedTweets := formatTweets(tweets)
-	if formattedTweets != nil {
-		message = strings.Join(formattedTweets, "\n")
+	formattedStatuses := formatStatuses(statuses)
+	if formattedStatuses != nil {
+		message = strings.Join(formattedStatuses, "\n")
 	}
 	return message, err
 }
 
-// init initalizes a PassiveCommand for expanding Tweets.
+// init initalizes a PassiveCommand for expanding Statuses.
 func init() {
 	bot.RegisterPassiveCommand(
 		"twitter",
-		expandTweets)
+		expandStatuses)
 }
