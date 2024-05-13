@@ -28,7 +28,7 @@ type Status struct {
 // then attempts to extract the Tweet ID from the link.
 // It returns an array of Tweet IDs.
 func findTweetIDs(message string) ([]int64, error) {
-	re := regexp.MustCompile(`http(?:s)?://(?:mobile.)?twitter.com/(?:.*)/status/([0-9]*)`)
+	re := regexp.MustCompile(`http(?:s)?://((?:mobile.)?twitter|x).com/(?:.*)/status/([0-9]*)`)
 	// FIXME this is only returning the LAST match, should return ALL matches
 	result := re.FindAllStringSubmatch(message, -1)
 	var (
@@ -64,40 +64,41 @@ func fetchTweets(tweetIDs []int64) ([]Status, error) {
 // fetchTweet takes a twitter.Client and a single Tweet ID and fetches the
 // corresponding Status.
 // It returns a twitter.Tweet.
-func fetchTweet(tweetID int64) (Status, error) {
-	var err error
-	var status Status
+func fetchTweet(id int64) (Status, error) {
 	// TODO get alt text
 	// tweet.media.photos[].altText
+	response, err := getJson(id)
 
-	resp, err := http.Get(fmt.Sprintf("%s/status/%d", apiUrl, tweetID))
+	if err != nil {
+		return Status{}, err
+	}
 
-	// If we return nil instead of tweet, a panic happens
+	status := Status{
+		Name: fmt.Sprint(response["tweet"].(map[string]interface{})["author"].(map[string]interface{})["name"]),
+		Text: fmt.Sprint(response["tweet"].(map[string]interface{})["text"])}
+
+	return status, nil
+}
+
+func getJson(id int64) (map[string]interface{}, error) {
+	resp, err := http.Get(fmt.Sprintf("%s/status/%d", apiUrl, id))
+
 	if resp.StatusCode/200 != 1 {
-		return status, errors.New(resp.Status)
+		return nil, errors.New(resp.Status)
 	} else if err != nil {
-		return status, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return Status{}, err
+		return nil, err
 	}
 
-	decodedResponse := map[string]interface{}{}
-	err = json.Unmarshal(body, &decodedResponse)
-
-	if err != nil {
-		return Status{}, err
-	}
-
-	status = Status{
-		Name: fmt.Sprint(decodedResponse["tweet"].(map[string]interface{})["author"].(map[string]interface{})["name"]),
-		Text: fmt.Sprint(decodedResponse["tweet"].(map[string]interface{})["text"])}
-
-	return status, nil
+	response := map[string]interface{}{}
+	err = json.Unmarshal(body, &response)
+	return response, err
 }
 
 // formatTweets takes an array of twitter.Tweets and formats them in preparation for

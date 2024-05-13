@@ -50,7 +50,12 @@ func TestTwitter(t *testing.T) {
 			input:         "http://twitter.com/notARealUser/status/123456789",
 			output:        "",
 			expectedError: errors.New("404 Not Found"),
-		}}
+		}, {
+			input:         "https://x.com/terriblemaps/status/1789732549415117071",
+			output:        "Terrible Maps: Cow-to-person ratio in Wisconsin",
+			expectedError: nil,
+		},
+	}
 
 	Convey("twitter", t, func() {
 		for _, c := range cases {
