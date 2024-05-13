@@ -1,4 +1,4 @@
-module github.com/go-chat-bot/plugins/mastodon
+module github.com/akatch/go-chat-bot_plugins/fediverse
 
 go 1.18
 

@@ -1,4 +1,4 @@
-module github.com/go-chat-bot/plugins/acquisition
+module github.com/akatch/go-chat-bot_plugins/acquisition
 
 go 1.18
 

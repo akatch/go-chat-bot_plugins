@@ -12,7 +12,6 @@ func TestTwitter(t *testing.T) {
 	// given a message string, I should get back a response message string
 	// containing one or more parsed Tweets
 	jbouieOutput := `b-boy bouiebaisse: This falls into one of my favorite genres of tweets, bona fide elites whose pretenses to understanding “common people” instead reveal their cloistered, condescending view of ordinary people.`
-	dmackdrwnsOutput := `David Mack: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart`
 
 	var cases = []struct {
 		input, output string
@@ -44,7 +43,7 @@ func TestTwitter(t *testing.T) {
 			expectedError: nil,
 		}, {
 			input:         "https://twitter.com/dmackdrwns/status/1217830568848764930/photo/1",
-			output:        dmackdrwnsOutput,
+			output:        `David Mack: It was pretty fun to try to manifest creatures plucked right from the minds of manic children.  #georgiamuseumofart`,
 			expectedError: nil,
 		}, {
 			input:         "http://twitter.com/notARealUser/status/123456789",

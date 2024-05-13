@@ -1,4 +1,4 @@
-module github.com/go-chat-bot/plugins
+module github.com/akatch/go-chat-bot_plugins
 
 go 1.13
 

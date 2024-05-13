@@ -1,4 +1,4 @@
-module github.com/go-chat-bot/plugins/twitter
+module github.com/akatch/go-chat-bot_plugins/twitter
 
 go 1.18
 

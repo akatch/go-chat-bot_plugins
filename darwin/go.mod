@@ -1,4 +1,4 @@
-module github.com/go-chat-bot/plugins/darwin
+module github.com/akatch/go-chat-bot_plugins/darwin
 
 go 1.18
 
