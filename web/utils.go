@@ -2,13 +2,16 @@ package web
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
 
 func GetBody(url string) ([]byte, error) {
 	res, err := http.Get(url)
-	if err != nil {
+	if res.StatusCode/200 != 1 {
+		return nil, errors.New(res.Status)
+	} else if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
