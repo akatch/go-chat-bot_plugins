@@ -3,15 +3,12 @@
 package twitter
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/akatch/go-chat-bot_plugins/web"
 	"github.com/go-chat-bot/bot"
 )
 
@@ -67,7 +64,8 @@ func fetchStatuses(statusIDs []int64) ([]Status, error) {
 func fetchStatus(id int64) (Status, error) {
 	// TODO get alt text
 	// tweet.media.photos[].altText
-	response, err := getJson(id)
+	response := map[string]interface{}{}
+	err := web.GetJSON(fmt.Sprintf("%s/status/%d", apiUrl, id), &response)
 
 	if err != nil {
 		return Status{}, err
@@ -78,27 +76,6 @@ func fetchStatus(id int64) (Status, error) {
 		Text: fmt.Sprint(response["tweet"].(map[string]interface{})["text"])}
 
 	return status, nil
-}
-
-func getJson(id int64) (map[string]interface{}, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/status/%d", apiUrl, id))
-
-	if resp.StatusCode/200 != 1 {
-		return nil, errors.New(resp.Status)
-	} else if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	response := map[string]interface{}{}
-	err = json.Unmarshal(body, &response)
-	return response, err
 }
 
 // formatStatuses takes an array of twitter.Statuses and formats them in preparation for
