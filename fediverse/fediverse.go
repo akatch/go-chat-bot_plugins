@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/go-chat-bot/bot"
-	"github.com/jaytaylor/html2text"
+	"github.com/k3a/html2text"
 	"github.com/mattn/go-mastodon"
 )
 
@@ -81,10 +81,7 @@ func formatStatuses(s []mastodon.Status) []string {
 		// TODO get link title, eg: user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
 		// TODO get alt text
 		username := st.Account.DisplayName
-		pt, err := html2text.FromString(st.Content, html2text.Options{TextOnly: true, OmitLinks: true})
-		if err != nil {
-			return nil
-		}
+		pt := html2text.HTML2TextWithOptions(st.Content, html2text.WithLinksInnerText())
 		text := newlines.ReplaceAllString(pt, " ")
 		newMessage := fmt.Sprintf(formatString, username, text)
 		messages = append(messages, newMessage)
