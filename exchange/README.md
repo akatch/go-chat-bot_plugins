@@ -12,6 +12,7 @@ exchange
   register -- subcommand for joining a Campaign
     address -- add freeform address
     notes -- add freeform notes
+    show -- display this user's existing information
 
   campaign -- subcommands for managing Campaigns
     init -- initialize an empty campaign for a channel
