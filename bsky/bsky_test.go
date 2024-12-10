@@ -29,6 +29,10 @@ func TestBsky(t *testing.T) {
 			input:         "https://bsky.app/profile/fake.bsky.social/post/3lbfojkcj4c2s",
 			output:        "",
 			expectedError: errors.New("400 Bad Request"),
+		}, {
+			input:         "https://bsky.app/profile/andrewtorrez.bsky.social/post/3lbk7mkb5f22x",
+			output:        `P. Andrew Torrez: 1/ This morning, Judge Liman ordered lawyers for the Freeman/Moss plaintiffs trying to collect on their $148MM defamation judgment against Rudy Giuliani to answer TODAY whether their pending motion to compel discovery from "Standard USA, LLC" is moot.  www.courtlistener.com/docket/69015...`,
+			expectedError: nil,
 		},
 	}
 
