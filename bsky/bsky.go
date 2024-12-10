@@ -16,9 +16,7 @@ const (
 )
 
 type Post struct {
-	handle, id string
-	name       string //`json:"thread.post.author.displayName"`
-	text       string //`json:"thread.post.record.text"`
+	handle, id, name, text string
 }
 
 // findPosts checks a given message string for strings that look like Bluesky links,
@@ -34,11 +32,7 @@ func findPosts(message string) ([]Post, error) {
 
 	// parse server URL and post ID from `result`
 	// server URL is the right-most non-empty DNS name match
-	//fmt.Printf("%v\n", result)
 	for i := range result {
-
-		//fmt.Printf("%v\n", result[i][1])
-		//fmt.Printf("%v\n", result[i][2])
 		posts = append(posts, Post{handle: result[i][1], id: result[i][2]})
 	}
 
@@ -63,8 +57,6 @@ func fetchPosts(s []Post) ([]Post, error) {
 // fetchPost takes a single Post ID and returns the
 // corresponding Post.
 func fetchPost(post *Post) (*Post, error) {
-	// curl -sqG --data-urlencode "uri=at://jaredlholt.bsky.social/app.bsky.feed.post/3lbfojkcj4c2s" --data-urlencode depth=0 --data-urlencode parentHeight=0 https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread | jq '"\(.thread.post.author.displayName): \(.thread.post.record.text)"'
-
 	response := map[string]interface{}{}
 	err := web.GetJSON(fmt.Sprintf(`%s?uri=at://%s/app.bsky.feed.post/%s&depth=0&parentHeight=0`, apiUrl, post.handle, post.id), &response)
 
