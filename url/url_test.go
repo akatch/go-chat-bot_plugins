@@ -2,11 +2,12 @@ package url
 
 import (
 	"fmt"
-	"github.com/go-chat-bot/bot"
-	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-chat-bot/bot"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestURL(t *testing.T) {
@@ -82,7 +83,7 @@ func TestURL(t *testing.T) {
 
 			_, err := urlTitle(cmd)
 
-			So(err, ShouldNotBeNil)
+			So(err, ShouldBeNil)
 		})
 
 		Convey("if the url doesn't have a protocol", func() {

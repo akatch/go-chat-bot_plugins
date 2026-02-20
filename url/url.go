@@ -1,12 +1,13 @@
 package url
 
 import (
-	"github.com/go-chat-bot/bot"
-	"github.com/go-chat-bot/plugins/web"
 	"html"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/go-chat-bot/bot"
+	"github.com/go-chat-bot/plugins/web"
 )
 
 const (
@@ -51,7 +52,8 @@ func urlTitle(cmd *bot.PassiveCmd) (string, error) {
 
 	body, err := web.GetBody(URL)
 	if err != nil {
-		return "", err
+		// Do not surface HTTP errors
+		return "", nil
 	}
 
 	title := re.FindString(string(body))
