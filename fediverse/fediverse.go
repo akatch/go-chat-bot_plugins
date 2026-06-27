@@ -76,13 +76,15 @@ func fetchStatus(s Status) (*mastodon.Status, error) {
 func formatStatuses(s []mastodon.Status) []string {
 	formatString := "%s: %s"
 	newlines := regexp.MustCompile(`\r?\n`)
+	linkText := regexp.MustCompile(`https:\/\/\S+\/tags\/`)
 	var messages []string
 	for _, st := range s {
 		// TODO get link title, eg: user: look at this cool thing https://thing.cool (Link title: A Cool Thing)
 		// TODO get alt text
 		username := st.Account.DisplayName
-		pt := html2text.HTML2TextWithOptions(st.Content, html2text.WithLinksInnerText())
-		text := newlines.ReplaceAllString(pt, " ")
+		pt := html2text.HTML2Text(st.Content)
+		text := newlines.ReplaceAllString(pt, " ")  // Condense newlines
+		text = linkText.ReplaceAllString(text, "#") // Replace hashtag links with just the #Hashtag
 		newMessage := fmt.Sprintf(formatString, username, text)
 		messages = append(messages, newMessage)
 	}
