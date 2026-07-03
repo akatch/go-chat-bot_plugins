@@ -54,11 +54,19 @@ func fetchPosts(s []Post) ([]Post, error) {
 	return posts, nil
 }
 
+func GetAPIURL(post *Post) string {
+	return fmt.Sprintf(
+		`%s?uri=at://%s/app.bsky.feed.post/%s&depth=0&parentHeight=0`,
+		apiUrl,
+		post.handle,
+		post.id)
+}
+
 // fetchPost takes a single Post ID and returns the
 // corresponding Post.
 func fetchPost(post *Post) (*Post, error) {
 	response := map[string]interface{}{}
-	err := web.GetJSON(fmt.Sprintf(`%s?uri=at://%s/app.bsky.feed.post/%s&depth=0&parentHeight=0`, apiUrl, post.handle, post.id), &response)
+	err := web.GetJSON(GetAPIURL(post), &response)
 
 	if err != nil {
 		return post, err
