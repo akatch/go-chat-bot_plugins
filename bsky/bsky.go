@@ -16,7 +16,7 @@ const (
 )
 
 type Post struct {
-	handle, id, name, text string
+	Handle, ID, Name, Text string
 }
 
 // findPosts checks a given message string for strings that look like Bluesky links,
@@ -33,7 +33,7 @@ func findPosts(message string) ([]Post, error) {
 	// parse server URL and post ID from `result`
 	// server URL is the right-most non-empty DNS name match
 	for i := range result {
-		posts = append(posts, Post{handle: result[i][1], id: result[i][2]})
+		posts = append(posts, Post{Handle: result[i][1], ID: result[i][2]})
 	}
 
 	return posts, err
@@ -58,8 +58,8 @@ func GetAPIURL(post *Post) string {
 	return fmt.Sprintf(
 		`%s?uri=at://%s/app.bsky.feed.post/%s&depth=0&parentHeight=0`,
 		apiUrl,
-		post.handle,
-		post.id)
+		post.Handle,
+		post.ID)
 }
 
 // fetchPost takes a single Post ID and returns the
@@ -73,10 +73,10 @@ func fetchPost(post *Post) (*Post, error) {
 	}
 
 	post = &Post{
-		handle: post.handle,
-		id:     post.id,
-		name:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["author"].(map[string]interface{})["displayName"]),
-		text:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["record"].(map[string]interface{})["text"])}
+		Handle: post.Handle,
+		ID:     post.ID,
+		Name:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["author"].(map[string]interface{})["displayName"]),
+		Text:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["record"].(map[string]interface{})["text"])}
 
 	return post, err
 }
@@ -90,7 +90,7 @@ func formatPosts(posts []Post) []string {
 	var messages []string
 	for _, post := range posts {
 		// TODO include alt text thread.post.embed.images[].alt
-		newMessage := fmt.Sprintf(formatString, post.name, newlines.ReplaceAllString(post.text, " "))
+		newMessage := fmt.Sprintf(formatString, post.Name, newlines.ReplaceAllString(post.Text, " "))
 		messages = append(messages, newMessage)
 	}
 	return messages
