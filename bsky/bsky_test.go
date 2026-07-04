@@ -37,7 +37,7 @@ func TestBsky(t *testing.T) {
 	}
 
 	//SetDefaultStackMode(StackError)
-	Convey("fediverse", t, func() {
+	Convey("bsky", t, func() {
 		for _, c := range cases {
 			testingCmd := bot.PassiveCmd{
 				Raw:     c.input,
