@@ -120,7 +120,7 @@ func fetchPost(post *Response) (*Response, error) {
 }
 
 // JSON returns a JSON string representation of the Response
-func (post Response) JSON() string {
+func (post *Response) JSON() string {
 	str, err := json.MarshalIndent(post, "", "  ")
 	if err != nil {
 		return err.Error()
@@ -129,8 +129,9 @@ func (post Response) JSON() string {
 }
 
 // String returns a concise string representation of the Response, including image alt text if present
-func (post Response) String() string {
+func (post *Response) String() string {
 	newlines := regexp.MustCompile(`\r?\n`)
+	name := post.Thread.Post.Author.Name
 	text := newlines.ReplaceAllString(post.Thread.Post.Record.Text, " ")
 
 	if len(post.Thread.Post.Record.Embed.Images) > 0 {
@@ -138,17 +139,9 @@ func (post Response) String() string {
 		for _, t := range post.Thread.Post.Record.Embed.Images {
 			alts += fmt.Sprintf("[image alt text: %s] ", t.Alt)
 		}
-		return fmt.Sprintf(
-			"%s: %s %s",
-			post.Thread.Post.Author.Name,
-			text,
-			alts,
-		)
+		return fmt.Sprintf("%s: %s %s", name, text, alts)
 	} else {
-		return fmt.Sprintf(
-			"%s: %s",
-			post.Thread.Post.Author.Name,
-			text)
+		return fmt.Sprintf("%s: %s", name, text)
 	}
 
 }
