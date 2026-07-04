@@ -3,6 +3,7 @@
 package bsky
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -15,25 +16,62 @@ const (
 	apiUrl = "https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread"
 )
 
+type Response struct {
+	Thread *Thread `json:"thread"`
+}
+
+type Thread struct {
+	Post *Post `json:"post"`
+}
+
 type Post struct {
-	Handle, ID, Name, Text string
+	ID     string  `json:"cid"`
+	Author *Author `json:"author"`
+	Record *Record `json:"record"`
+}
+
+type Author struct {
+	Handle string `json:"handle"`
+	Name   string `json:"displayName"`
+}
+
+type Record struct {
+	Text  string `json:"text"`
+	Embed *Embed `json:"embed"`
+}
+
+type Embed struct {
+	Images []*Image `json:"images"`
+}
+
+type Image struct {
+	Alt string `json:"alt"`
 }
 
 // findPosts checks a given message string for strings that look like Bluesky links,
 // then attempts to extract the server and post ID from the link.
 // It returns an array of Posts.
-func findPosts(message string) ([]Post, error) {
+func findPosts(message string) ([]Response, error) {
 	re := regexp.MustCompile(`http(?:s)?://bsky\.app/profile/?(.*)/post/?([A-z0-9]*)`)
 	result := re.FindAllStringSubmatch(message, -1)
 	var (
-		posts []Post
+		posts []Response
 		err   error
 	)
 
 	// parse server URL and post ID from `result`
 	// server URL is the right-most non-empty DNS name match
 	for i := range result {
-		posts = append(posts, Post{Handle: result[i][1], ID: result[i][2]})
+		posts = append(
+			posts,
+			Response{
+				Thread: &Thread{
+					Post: &Post{
+						ID: result[i][2],
+						Author: &Author{
+							Handle: result[i][1],
+						},
+					}}})
 	}
 
 	return posts, err
@@ -42,8 +80,8 @@ func findPosts(message string) ([]Post, error) {
 // fetchPosts takes an array of Post IDs and retrieves the corresponding
 // Posts.
 // It returns an array of Posts.
-func fetchPosts(s []Post) ([]Post, error) {
-	var posts []Post
+func fetchPosts(s []Response) ([]Response, error) {
+	var posts []Response
 	for _, id := range s {
 		p, err := fetchPost(&id)
 		if err != nil {
@@ -54,43 +92,60 @@ func fetchPosts(s []Post) ([]Post, error) {
 	return posts, nil
 }
 
-func GetAPIURL(post *Post) string {
+func GetAPIURL(post *Response) string {
 	return fmt.Sprintf(
 		`%s?uri=at://%s/app.bsky.feed.post/%s&depth=0&parentHeight=0`,
 		apiUrl,
-		post.Handle,
-		post.ID)
+		post.Thread.Post.Author.Handle,
+		post.Thread.Post.ID)
 }
 
 // fetchPost takes a single Post ID and returns the
 // corresponding Post.
-func fetchPost(post *Post) (*Post, error) {
-	response := map[string]interface{}{}
-	err := web.GetJSON(GetAPIURL(post), &response)
-
+func fetchPost(post *Response) (*Response, error) {
+	resp, err := web.GetBody(GetAPIURL(post))
 	if err != nil {
-		return post, err
+		return nil, err
 	}
 
-	post = &Post{
-		Handle: post.Handle,
-		ID:     post.ID,
-		Name:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["author"].(map[string]interface{})["displayName"]),
-		Text:   fmt.Sprint(response["thread"].(map[string]interface{})["post"].(map[string]interface{})["record"].(map[string]interface{})["text"])}
+	var r Response
+	err = json.Unmarshal(resp, &r)
 
-	return post, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+
+}
+
+// JSON returns a JSON string representation of the Response
+func (post Response) JSON() string {
+	str, err := json.MarshalIndent(post, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(str)
+}
+
+// String returns a concise string representation of the Response
+func (post Response) String() string {
+	newlines := regexp.MustCompile(`\r?\n`)
+
+	return fmt.Sprintf(
+		"%s: %s",
+		post.Thread.Post.Author.Name,
+		newlines.ReplaceAllString(post.Thread.Post.Record.Text, " "))
+
 }
 
 // formatPosts takes an array of Posts and formats them in preparation for
 // sending as a chat message.
 // It returns an array of nicely formatted strings.
-func formatPosts(posts []Post) []string {
-	formatString := "%s: %s"
-	newlines := regexp.MustCompile(`\r?\n`)
+func formatPosts(posts []Response) []string {
 	var messages []string
 	for _, post := range posts {
-		// TODO include alt text thread.post.embed.images[].alt
-		newMessage := fmt.Sprintf(formatString, post.Name, newlines.ReplaceAllString(post.Text, " "))
+		newMessage := post.String()
 		messages = append(messages, newMessage)
 	}
 	return messages
