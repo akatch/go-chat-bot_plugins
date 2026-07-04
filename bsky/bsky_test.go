@@ -19,11 +19,11 @@ func TestBsky(t *testing.T) {
 			expectedError: nil,
 		}, {
 			input:         "https://bsky.app/profile/jaredlholt.bsky.social/post/3lbfojkcj4c2s",
-			output:        "Jared Holt: Checked in on how the lawsuit against Minnesota for its law banning certain \"deep fake\" content around elections was going and the plaintiff's counsel is alleging that an expert witness offered by the state cited an academic article that doesn't exist and that the citation may be an AI hallucination [image 0 alt text: &{legal filing alleges expert testimony in case cited a nonexistent article}] ",
+			output:        "Jared Holt: Checked in on how the lawsuit against Minnesota for its law banning certain \"deep fake\" content around elections was going and the plaintiff's counsel is alleging that an expert witness offered by the state cited an academic article that doesn't exist and that the citation may be an AI hallucination [image alt text: legal filing alleges expert testimony in case cited a nonexistent article] ",
 			expectedError: nil,
 		}, {
 			input:         "wow check out this bsky https://bsky.app/profile/jaredlholt.bsky.social/post/3lbfojkcj4c2s super cool right?",
-			output:        "Jared Holt: Checked in on how the lawsuit against Minnesota for its law banning certain \"deep fake\" content around elections was going and the plaintiff's counsel is alleging that an expert witness offered by the state cited an academic article that doesn't exist and that the citation may be an AI hallucination [image 0 alt text: &{legal filing alleges expert testimony in case cited a nonexistent article}] ",
+			output:        "Jared Holt: Checked in on how the lawsuit against Minnesota for its law banning certain \"deep fake\" content around elections was going and the plaintiff's counsel is alleging that an expert witness offered by the state cited an academic article that doesn't exist and that the citation may be an AI hallucination [image alt text: legal filing alleges expert testimony in case cited a nonexistent article] ",
 			expectedError: nil,
 		}, {
 			input:         "https://bsky.app/profile/fake.bsky.social/post/3lbfojkcj4c2s",
@@ -31,7 +31,7 @@ func TestBsky(t *testing.T) {
 			expectedError: errors.New("400 Bad Request"),
 		}, {
 			input:         "https://bsky.app/profile/andrewtorrez.bsky.social/post/3lbk7mkb5f22x",
-			output:        `P. Andrew Torrez: 1/ This morning, Judge Liman ordered lawyers for the Freeman/Moss plaintiffs trying to collect on their $148MM defamation judgment against Rudy Giuliani to answer TODAY whether their pending motion to compel discovery from "Standard USA, LLC" is moot.  www.courtlistener.com/docket/69015... [image 0 alt text: &{ORDER taking under advisement 137 Motion to Compel. Plaintiffs to indicate by letter no later than November 22, 2024, why this motion should not be denied as moot in light of the filing at Dkt. No. 139. (HEREBY ORDERED by Judge Lewis J. Liman)(Text Only Order) (Liman, Lewis) (Entered: 11/22/2024)}] `,
+			output:        `P. Andrew Torrez: 1/ This morning, Judge Liman ordered lawyers for the Freeman/Moss plaintiffs trying to collect on their $148MM defamation judgment against Rudy Giuliani to answer TODAY whether their pending motion to compel discovery from "Standard USA, LLC" is moot.  www.courtlistener.com/docket/69015... [image alt text: ORDER taking under advisement 137 Motion to Compel. Plaintiffs to indicate by letter no later than November 22, 2024, why this motion should not be denied as moot in light of the filing at Dkt. No. 139. (HEREBY ORDERED by Judge Lewis J. Liman)(Text Only Order) (Liman, Lewis) (Entered: 11/22/2024)] `,
 			expectedError: nil,
 		},
 	}
