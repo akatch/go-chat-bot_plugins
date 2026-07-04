@@ -128,14 +128,28 @@ func (post Response) JSON() string {
 	return string(str)
 }
 
-// String returns a concise string representation of the Response
+// String returns a concise string representation of the Response, including image alt text if present
 func (post Response) String() string {
 	newlines := regexp.MustCompile(`\r?\n`)
+	text := newlines.ReplaceAllString(post.Thread.Post.Record.Text, " ")
 
-	return fmt.Sprintf(
-		"%s: %s",
-		post.Thread.Post.Author.Name,
-		newlines.ReplaceAllString(post.Thread.Post.Record.Text, " "))
+	if len(post.Thread.Post.Record.Embed.Images) > 0 {
+		var alts string
+		for i, t := range post.Thread.Post.Record.Embed.Images {
+			alts += fmt.Sprintf("[image %d alt text: %s] ", i, t)
+		}
+		return fmt.Sprintf(
+			"%s: %s %s",
+			post.Thread.Post.Author.Name,
+			text,
+			alts,
+		)
+	} else {
+		return fmt.Sprintf(
+			"%s: %s",
+			post.Thread.Post.Author.Name,
+			text)
+	}
 
 }
 
