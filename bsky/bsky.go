@@ -137,7 +137,9 @@ func (post *Response) String() string {
 	if len(post.Thread.Post.Record.Embed.Images) > 0 {
 		var alts string
 		for _, t := range post.Thread.Post.Record.Embed.Images {
-			alts += fmt.Sprintf("[image alt text: %s] ", t.Alt)
+			if t.Alt != "" {
+				alts += fmt.Sprintf("[image alt text: %s] ", t.Alt)
+			}
 		}
 		return fmt.Sprintf("%s: %s %s", name, text, alts)
 	} else {
