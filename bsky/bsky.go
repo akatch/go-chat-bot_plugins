@@ -62,14 +62,16 @@ func findPosts(message string) ([]Response, error) {
 	// parse server URL and post ID from `result`
 	// server URL is the right-most non-empty DNS name match
 	for i := range result {
+		id := result[i][2]
+		handle := result[i][1]
 		posts = append(
 			posts,
 			Response{
 				Thread: &Thread{
 					Post: &Post{
-						ID: result[i][2],
+						ID: id,
 						Author: &Author{
-							Handle: result[i][1],
+							Handle: handle,
 						},
 					}}})
 	}
@@ -138,7 +140,8 @@ func (post *Response) String() string {
 		var alts string
 		for _, t := range post.Thread.Post.Record.Embed.Images {
 			if t.Alt != "" {
-				alts += fmt.Sprintf("[image alt text: %s] ", t.Alt)
+				altText := newlines.ReplaceAllString(t.Alt, " ")
+				alts += fmt.Sprintf("[image alt text: %s]\n", altText)
 			}
 		}
 		return fmt.Sprintf("%s: %s %s", name, text, alts)
